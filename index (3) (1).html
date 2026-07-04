@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TSH - Last Chatter Standing</title>
+    <!--
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+    <link rel="manifest" href="./site.webmanifest">
+    !-->
+    <meta
+      property="og:title"
+      content="TSH - Last Chatter Standing"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://gnzzy7.github.io/tshlcs" />
+    <meta property="og:locale" content="en" />
+    <meta
+      property="og:description"
+      content="TSH Last Chatter Standing In Real Time"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="
+  TSH Last Chatter Standing In Real Time"
+    />
+    <meta
+      name="twitter:description"
+      content="TSH Last Chatter Standing In Real Time"
+    />
+    <meta
+      name="description"
+      content="TSH Last Chatter Standing In Real Time"
+    />
+    <meta name="theme-color" content="#1b385e" />
+  </head>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #111c27;
+    }
+    
+    number-flow {
+      --number-flow-mask-height: 0em !important;
+      --number-flow-mask-width: 0em !important;
+    }
+
+    .container {
+      width: min(1152px, 90vw);
+      margin-inline: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+    }
+
+    .title {
+      font-family: "Outfit", sans-serif;
+      font-size: min(105px, 15vw);
+      position: relative;
+      margin-top: max(-15px, -2vw);
+    }
+
+    .title * {
+      font-size: inherit;
+    }
+
+    .title {
+      background-clip: text;
+      background-image: linear-gradient(to bottom right, gold, #623003);
+      color: transparent;
+    }
+
+    .title .border {
+      --border-width: min(4px, 0.6vw);
+      --border-color: #3a2a01;
+      color: transparent;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      text-shadow:
+        calc(let(--border-width) * -1) calc(let(--border-width) * -1) 0
+          let(--border-color),
+        let(--border-width) calc(let(--border-width) * -1) 0 let(--border-color),
+        calc(let(--border-width) * -1) let(--border-width) 0 let(--border-color),
+        let(--border-width) let(--border-width) 0 let(--border-color);
+    }
+
+    .subtitle {
+      color: #c6aa83;
+      font-family: "Outfit", sans-serif;
+      font-size: min(28px, 4vw);
+      margin-top: min(4px, 0.6vw);
+    }
+
+    .users {
+      margin-top: min(24px, 3.5vw);
+      position: relative;
+      /*background-color: #1a1a1a;
+      border: min(4px, 0.6vw) solid #363435;
+      border-radius: min(24px, 3.5vw);*/
+      width: 100%;
+      height: 0;
+      position: relative;
+      text-align: left;
+    }
+
+    .users .user {
+      position: absolute;
+      top: 0;
+      --background-color: #1b1b1b;
+      --border-color: #363435;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: min(8px, 1vw);
+      padding: min(10px, 1.4vw);
+      background-color: let(--background-color);
+      border-width: min(4px, 0.6vw);
+      border-style: solid;
+      border-radius: min(24px, 3.5vw);
+      margin: max(-4px, -0.6vw);
+      flex-wrap: wrap;
+      width: 100%;
+      transition: 2s;
+    }
+    
+    .user * {
+      transition: 2s;
+    }
+
+    .user.first {
+      --background-color: #281d00;
+      --border-color: #403802;
+    }
+
+    .user.eliminated {
+      --background-color: #280000;
+      --border-color: #5a0808;
+    }
+
+    .users .user > div {
+      display: flex;
+      gap: min(20px, 2.85vw);
+    }
+
+    .users .user img {
+      width: min(120px, 17vw);
+      height: min(120px, 17vw);
+      border-radius: 50%;
+    }
+
+    .user .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: min(15px, 2.15vw);
+    }
+
+    .user .user-info .name-and-gains {
+      display: flex;
+      align-items: center;
+      gap: min(12px, 1.7vw);
+    }
+
+    .user .user-info .name {
+      font-size: min(48px, 6.85vw);
+      font-family: "Outfit", sans-serif;
+      color: white;
+    }
+
+    .user .user-info .gains {
+      font-family: "Roboto", sans-serif;
+      font-weight: 700;
+      font-size: min(32px, 4.5vw);
+      color: #c9f178;
+    }
+
+    .user .user-info .stats {
+      display: flex;
+      align-items: center;
+      gap: min(24px, 3.5vw);
+      font-family: "Roboto", sans-serif;
+      font-weight: 700;
+      font-size: min(32px, 3.5vw);
+    }
+
+    .user .user-info .total {
+      color: yellow;
+    }
+
+    .user .user-info .xp {
+      color: #f449ad;
+    }
+
+    .user .messages {
+      font-family: "Roboto", sans-serif;
+      font-weight: 500;
+      font-size: min(100px, 14vw);
+      color: white;
+    }
+
+    .users .elimination-text {
+      position: absolute;
+      width: 100%;
+      z-index: 1;
+      opacity: 0;
+      top: 0;
+      display: flex;
+      align-items: center;
+      gap: min(16px, 2.28vw);
+      padding-block: min(16px, 2.28vw);
+      transition: 2s;
+    }
+
+    .users .elimination-text .line {
+      flex: 1;
+      height: min(4px, 0.6vw);
+      background: #ff7884;
+      box-shadow: 0 0 min(10px, 1.43vw) rgba(255, 34, 45, 0.9);
+    }
+
+    .users .elimination-text p {
+      font-family: "Outfit", sans-serif;
+      font-size: min(32px, 4.57vw);
+      font-weight: 300;
+      letter-spacing: min(3px, 0.43vw);
+      color: #f01818;
+      text-shadow:
+        0 min(2px, 0.3vw) 0 #5c0000,
+        0 min(2px, 1.2vw) min(12px, 1.8vw) rgba(126, 0, 0, 0.95),
+        0 0 (10px, 1.5vw) rgba(255, 0, 0, 0.45);
+    }
+  </style>
+  <body>
+    <div class="container">
+      <div class="title">
+        <h1 class="main">Last Chatter Standing</h1>
+        <h1 class="border">Last Chatter Standing</h1>
+      </div>
+      <p class="subtitle">As it stands</p>
+      <div class="users">
+        <div class="elimination-text">
+          <div class="line"></div>
+          <p>ELIMINATION</p>
+          <div class="line"></div>
+        </div>
+        
+        <!--
+        <div class="user first">
+          <div>
+            <img
+              src="https://yt3.googleusercontent.com/bnk5Yqp8WfIhv04oa-_Jq7z4a832LEEX-YAym_ExkHrIn0DO57xiPD67u3J2cgv3lS9r3c4yJxY=s160-c-k-c0x00ffffff-no-rj"
+            />
+            <div class="user-info">
+              <div class="name-and-gains">
+                <p class="name">maxitro</p>
+                <p class="gains">+1,729/day</p>
+              </div>
+              <div class="stats">
+                <p class="total">TOTAL: 128,628</p>
+                <p class="xp">XP: 12,729</p>
+              </div>
+            </div>
+          </div>
+          <number-flow class="messages">0</number-flow>
+        </div>
+        <div class="user">
+          <div>
+            <img
+              src="https://cdn.discordapp.com/guilds/1415768949651669024/users/1000312516796219483/avatars/ab0d679566b66fcbf58f850703c4388b.png?size=4096"
+            />
+            <div class="user-info">
+              <div class="name-and-gains">
+                <p class="name">spyultime</p>
+                <p class="gains">+1,729/day</p>
+              </div>
+              <div class="stats">
+                <p class="total">TOTAL: 128,628</p>
+                <p class="xp">XP: 12,729</p>
+              </div>
+            </div>
+          </div>
+          <number-flow class="messages">0</number-flow>
+        </div>
+        <div class="user">
+          <div>
+            <img
+              src="https://yt3.ggpht.com/h6PIUCdkmwO-1pMHlKHTWMaHYMAX6ofC2Zd7oVc4aM_CaQ5tX33A5w1hzAhlHr1uI9vtS8cUa_E=s176-c-k-c0x00ffffff-no-rj-mo"
+            />
+            <div class="user-info">
+              <div class="name-and-gains">
+                <p class="name">gnzguy</p>
+                <p class="gains">+1,729/day</p>
+              </div>
+              <div class="stats">
+                <p class="total">TOTAL: 128,628</p>
+                <p class="xp">XP: 12,729</p>
+              </div>
+            </div>
+          </div>
+          <number-flow class="messages">0</number-flow>
+        </div>
+        <div class="user">
+          <div>
+            <img
+              src="https://yt3.googleusercontent.com/L_XHn09i70bSt9iOGj1nDFf8sX1MinSCPBu5j9XTFRYZ5Kkw6UVVs4IzHUKns5ltwZLOAm4=s160-c-k-c0x00ffffff-no-rj"
+            />
+            <div class="user-info">
+              <div class="name-and-gains">
+                <p class="name">nottca</p>
+                <p class="gains">+1,729/day</p>
+              </div>
+              <div class="stats">
+                <p class="total">TOTAL: 128,628</p>
+                <p class="xp">XP: 12,729</p>
+              </div>
+            </div>
+          </div>
+          <number-flow class="messages">0</number-flow>
+        </div>
+        <div class="user eliminated">
+          <div>
+            <img
+              src="https://yt3.ggpht.com/2OhnBr94gyFERn0GsAonOO_0CM5LzA_mJS6pqBJS_TK8iq70PRzbE0FmAKCdc-BetAXSzwsMSg=s176-c-k-c0x00ffffff-no-rj-mo"
+            />
+            <div class="user-info">
+              <div class="name-and-gains">
+                <p class="name">jipstats</p>
+                <p class="gains">+1,729/day</p>
+              </div>
+              <div class="stats">
+                <p class="total">TOTAL: 128,628</p>
+                <p class="xp">XP: 12,729</p>
+              </div>
+            </div>
+          </div>
+          <number-flow class="messages">0000</number-flow>
+        </div>
+        !-->
+      </div>
+    </div>
+  </body>
+  <script>
+    let originalMatchMedia = window.matchMedia;
+
+    window.matchMedia = (query) => {
+      if (query === "(prefers-reduced-motion: reduce)") {
+        return {
+          matches: false,
+          media: query,
+          addEventListener() {},
+          removeEventListener() {},
+          addListener() {},
+          removeListener() {},
+          onchange: null,
+          dispatchEvent() {
+            return false;
+          },
+        };
+      }
+
+      return originalMatchMedia(query);
+    };
+  </script>
+  <script type="module">
+    import "https://esm.sh/number-flow";
+    
+    let participants = [];
+    let eliminationCount = 3;
+    
+    function updateUser(user) {
+      let userEl = document.getElementById(`user-${user.id}`);
+      if (userEl) {
+        let position = participants
+          .slice(0, user.place)
+          .map(p => document.getElementById(`user-${p.id}`)?.offsetHeight ?? 0)
+          .reduce((a, b) => a + b, 0);
+        
+        userEl.querySelector("div").querySelector("img").src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096`;
+        userEl.querySelector("div").querySelector(".user-info").querySelector(".name-and-gains").querySelector("p").textContent = user.username;
+        userEl.querySelector("div").querySelector(".user-info").querySelector(".name-and-gains").querySelector("number-flow").update(user.totalMessages - user.totalMessagesYesterday);
+        userEl.querySelector("div").querySelector(".user-info").querySelector(".stats").querySelector(".total").update(user.totalMessages);
+        userEl.querySelector("div").querySelector(".user-info").querySelector(".stats").querySelector(".xp").update(user.xpEnd - user.xpStart);
+        userEl.querySelector(".messages").update(user.messages);
+        
+        if (user.place == 0) {
+          userEl.style.backgroundColor = "#281d00";
+          userEl.style.borderColor = "#403802";
+        } else if (user.place >= participants.length - eliminationCount) {
+          if (user.place == participants.length - eliminationCount) {
+            document.querySelector(".elimination-text").style.top = position + "px";
+            document.querySelector(".elimination-text").style.opacity = 1;
+          }
+          position += document.querySelector(".elimination-text").offsetHeight;
+          userEl.style.backgroundColor = "#280000";
+          userEl.style.borderColor = "#5a0808";
+        } else {
+          userEl.style.backgroundColor = "#1b1b1b";
+          userEl.style.borderColor = "#363435";
+        }
+        
+        userEl.style.top = position + "px";
+        userEl.style.opacity = 1;
+        return;
+      }
+      
+      let userBox = document.createElement('div');
+      userBox.className = 'user';
+      userBox.id = `user-${user.id}`;
+      userBox.style.backgroundColor = "#1b1b1b";
+      
+      let userTop = document.createElement('div');
+      
+      let avatar = document.createElement('img');
+      avatar.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096`;
+      
+      let userInfo = document.createElement('div');
+      userInfo.className = 'user-info';
+      
+      let nameAndGains = document.createElement('div');
+      nameAndGains.className = 'name-and-gains';
+      
+      let name = document.createElement('p');
+      name.className = 'name';
+      name.textContent = user.username;
+      
+      let gains = document.createElement('number-flow');
+      gains.className = 'gains';
+      gains.transformTiming = {
+        duration: 2000,
+        easing: "ease",
+      };
+      gains.numberPrefix = "+";
+      gains.numberSuffix = "/day";
+      gains.update(user.totalMessages - user.totalMessagesYesterday);
+      
+      nameAndGains.appendChild(name);
+      nameAndGains.appendChild(gains);
+      
+      let stats = document.createElement('div');
+      stats.className = 'stats';
+      
+      let total = document.createElement('number-flow');
+      total.className = 'total';
+      total.transformTiming = {
+        duration: 2000,
+        easing: "ease",
+      };
+      total.numberPrefix = "TOTAL: ";
+      total.update(user.totalMessages);
+      
+      let xp = document.createElement('number-flow');
+      xp.className = 'xp';
+      xp.transformTiming = {
+        duration: 2000,
+        easing: "ease",
+      };
+      xp.numberPrefix = "XP: ";
+      xp.update(user.xpEnd - user.xpStart);
+      
+      stats.appendChild(total);
+      stats.appendChild(xp);
+      
+      userInfo.appendChild(nameAndGains);
+      userInfo.appendChild(stats);
+      
+      userTop.appendChild(avatar);
+      userTop.appendChild(userInfo);
+      
+      let messages = document.createElement('number-flow');
+      messages.className = 'messages';
+      messages.transformTiming = {
+        duration: 2000,
+        easing: "ease",
+      };
+      messages.update(user.messages);
+      
+      userBox.appendChild(userTop);
+      userBox.appendChild(messages);
+      
+      userBox.style.top = 0;
+      userBox.style.opacity = 0; 
+      
+      document.querySelector(".users").append(userBox);
+    }
+    
+    function formatDate(unix) {
+      const date = new Date(unix);
+      // Get date parts
+      const d = date.getDate();
+      const m = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(date);
+      const y = date.getFullYear();
+    
+      // Add suffix (st, nd, rd, th)
+      let suffix = 'th';
+      if (d % 10 === 1 && d !== 11) suffix = 'st';
+      else if (d % 10 === 2 && d !== 12) suffix = 'nd';
+      else if (d % 10 === 3 && d !== 13) suffix = 'rd';
+    
+      // Get time parts
+      let hr = date.getHours();
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const ampm = hr >= 12 ? 'PM' : 'AM';
+    
+      // Convert to 12-hour format
+      hr = hr % 12;
+      hr = hr ? hr : 12; // the hour '0' should be '12'
+    
+      return `${m} ${d}${suffix}, ${hr}:${min}${ampm}`;
+    }
+    
+    function data() {
+      fetch("https://snozzyserver.onrender.com/api/tshlcs")
+      .then(res => res.json())
+      .then(data => {
+        document.querySelector(".subtitle").textContent = `As it stands - ${formatDate(data.UPDATED)}`;
+        participants = data.participants;
+        for (let i = 0; i < participants.length; i++) {
+          updateUser({
+            ...participants[i],
+            place: i
+          });
+        }
+      });
+    }
+    
+    data();
+    setInterval(data, 2000);
+  </script>
+</html>
