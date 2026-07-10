@@ -388,8 +388,8 @@
           .map(p => document.getElementById(`user-${p.id}`)?.offsetHeight ?? 0)
           .reduce((a, b) => a + b, 0);
         
-        userEl.querySelector("div").querySelector("img").src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096`;
-        userEl.querySelector("div").querySelector(".user-info").querySelector(".name-and-gains").querySelector("p").textContent = user.username;
+        userEl.querySelector("div").querySelector("img").src = user.avatar;
+        userEl.querySelector("div").querySelector(".user-info").querySelector(".name-and-gains").querySelector("p").textContent = user.name;
         userEl.querySelector("div").querySelector(".user-info").querySelector(".name-and-gains").querySelector("number-flow").update(user.totalMessages - user.totalMessagesYesterday);
         userEl.querySelector("div").querySelector(".user-info").querySelector(".stats").querySelector(".total").update(user.totalMessages);
         userEl.querySelector("div").querySelector(".user-info").querySelector(".stats").querySelector(".xp").update(user.xpEnd - user.xpStart);
@@ -424,7 +424,7 @@
       let userTop = document.createElement('div');
       
       let avatar = document.createElement('img');
-      avatar.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=4096`;
+      avatar.src = user.avatar;
       
       let userInfo = document.createElement('div');
       userInfo.className = 'user-info';
@@ -434,7 +434,7 @@
       
       let name = document.createElement('p');
       name.className = 'name';
-      name.textContent = user.username;
+      name.textContent = user.name;
       
       let gains = document.createElement('number-flow');
       gains.className = 'gains';
