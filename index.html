@@ -526,7 +526,9 @@
       .then(res => res.json())
       .then(data => {
         document.querySelector(".subtitle").textContent = `As it stands - ${formatDate(data.UPDATED)}`;
-        participants = data.participants.filter(p => !p.out || !p.eliminated);
+        participants = data.participants.filter(p => !p.out);
+        eliminationCount = data.eliminationCount;
+        
         for (let i = 0; i < participants.length; i++) {
           updateUser({
             ...participants[i],
