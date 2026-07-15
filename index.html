@@ -38,7 +38,7 @@
     <meta name="theme-color" content="#1b385e" />
   </head>
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
     * {
       margin: 0;
@@ -83,7 +83,7 @@
     }
 
     .title .border {
-      --border-width: min(4px, 0.6vw);
+      --border-width: ;
       --border-color: #3a2a01;
       color: transparent;
       position: absolute;
@@ -91,11 +91,11 @@
       left: 0;
       z-index: -1;
       text-shadow:
-        calc(let(--border-width) * -1) calc(let(--border-width) * -1) 0
-          let(--border-color),
-        let(--border-width) calc(let(--border-width) * -1) 0 let(--border-color),
-        calc(let(--border-width) * -1) let(--border-width) 0 let(--border-color),
-        let(--border-width) let(--border-width) 0 let(--border-color);
+        calc(min(4px, 0.6vw) * -1) calc(min(4px, 0.6vw) * -1) 0
+          #3a2a01,
+        min(4px, 0.6vw) calc(min(4px, 0.6vw) * -1) 0 #3a2a01,
+        calc(min(4px, 0.6vw) * -1) min(4px, 0.6vw) 0 #3a2a01,
+        min(4px, 0.6vw) min(4px, 0.6vw) 0 #3a2a01;
     }
 
     .subtitle {
@@ -155,11 +155,22 @@
       display: flex;
       gap: min(20px, 2.85vw);
     }
+    
+    .user .rank {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: min(60px, 8.57vw);
+      font-family: "Roboto Condensed";
+      font-weight: 500;
+      color: rgb(150, 150, 150);
+    }
 
     .users .user img {
       width: min(120px, 17vw);
       height: min(120px, 17vw);
       border-radius: 50%;
+      border: min(3px, 0.43vw) solid rgb(180, 180, 180);
     }
 
     .user .user-info {
@@ -379,6 +390,8 @@
     
     let participants = [];
     let eliminationCount = 3;
+    let baseEliminateIndex = 0;
+    let eliminationStartingIndex = 0;
     
     function updateUser(user) {
       let userEl = document.getElementById(`user-${user.id}`);
@@ -388,6 +401,7 @@
           .map(p => document.getElementById(`user-${p.id}`)?.offsetHeight ?? 0)
           .reduce((a, b) => a + b, 0);
         
+        userEl.querySelector("div").querySelector(".rank").querySelector("p").textContent = (user.place + 1).toString().padStart(2, "0");
         userEl.querySelector("div").querySelector("img").src = user.avatar;
         userEl.querySelector("div").querySelector(".user-info").querySelector(".name-and-gains").querySelector("p").textContent = user.name;
         userEl.querySelector("div").querySelector(".user-info").querySelector(".name-and-gains").querySelector("number-flow").update(user.totalMessages - user.totalMessagesYesterday);
@@ -398,17 +412,20 @@
         if (user.place == 0) {
           userEl.style.backgroundColor = "#281d00";
           userEl.style.borderColor = "#403802";
-        } else if (user.place >= participants.length - eliminationCount) {
-          if (user.place == participants.length - eliminationCount) {
+          userEl.querySelector("div").querySelector(".rank").querySelector("p").style.color = "gold";
+        } else if (user.place >= eliminationStartingIndex) {
+          if (user.place == eliminationStartingIndex) {
             document.querySelector(".elimination-text").style.top = position + "px";
             document.querySelector(".elimination-text").style.opacity = 1;
           }
           position += document.querySelector(".elimination-text").offsetHeight;
           userEl.style.backgroundColor = "#280000";
           userEl.style.borderColor = "#5a0808";
+          userEl.querySelector("div").querySelector(".rank").querySelector("p").style.color = "red";
         } else {
           userEl.style.backgroundColor = "#1b1b1b";
           userEl.style.borderColor = "#363435";
+          userEl.querySelector("div").querySelector(".rank").querySelector("p").style.color = "rgb(180, 180, 180)";
         }
         
         userEl.style.top = position + "px";
@@ -422,6 +439,13 @@
       userBox.style.backgroundColor = "#1b1b1b";
       
       let userTop = document.createElement('div');
+      
+      let userRank = document.createElement('div');
+      userRank.className = 'rank';
+      
+      let userRankText = document.createElement('p');
+      
+      userRank.appendChild(userRankText);
       
       let avatar = document.createElement('img');
       avatar.src = user.avatar;
@@ -476,6 +500,7 @@
       userInfo.appendChild(nameAndGains);
       userInfo.appendChild(stats);
       
+      userTop.appendChild(userRank);
       userTop.appendChild(avatar);
       userTop.appendChild(userInfo);
       
@@ -526,12 +551,39 @@
       .then(res => res.json())
       .then(data => {
         document.querySelector(".subtitle").textContent = `As it stands - ${formatDate(data.UPDATED)}`;
-        participants = data.participants.filter(p => !p.out);
         eliminationCount = data.eliminationCount;
+        
+        const newParticipants = data.participants.filter(p => !p.out && !p.eliminated);
+        
+        const participantIds = participants.map(p => p.id);
+        const newParticipantIds = newParticipants.map(p => p.id);
+        
+        const addParticipants = newParticipants.filter(p => !participantIds.includes(p.id));
+        const removeParticipants = participants.filter(p => !newParticipantIds.includes(p.id));
+        
+        for (let i = 0; i < addParticipants.length; i++) {
+          const participant = newParticipants.find(p => p.id === addParticipants[i].id);
+          updateUser({
+            ...participant,
+            place: i
+          });
+        }
+        
+        for (const participantId of removeParticipants) {
+          document.getElementById(`user-${participantId}`).style.opacity = 0;
+          setTimeout(() => {
+            document.getElementById(`user-${participantId}`).remove();
+          }, 2000);
+        }
+        
+        participants = newParticipants;
+        
+        baseEliminateIndex = participants.length - eliminationCount;
+        eliminationStartingIndex = participants?.[baseEliminateIndex - 1]?.messages - participants?.[baseEliminateIndex]?.messages >= participants?.[baseEliminateIndex]?.messages - participants?.[baseEliminateIndex + 1]?.messages ? baseEliminateIndex : baseEliminateIndex + 1;
         
         for (let i = 0; i < participants.length; i++) {
           updateUser({
-            ...participants[i],
+            ...newParticipants[i],
             place: i
           });
         }
